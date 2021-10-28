@@ -134,13 +134,16 @@ function insertUser($data){
     $user->description = $data->description;
     $user->image = $data->image;
 
-    if($user->insertUser()){
+    $err = $user->insertUser();
+    //echo $err;
+    
+    if($err == "ok"){
         echo json_encode(
-            array('message' => 'User Created')
+            array('message' => 'ok')
         );
     }else{
         echo json_encode(
-            array('message' => 'User Not Created')
+            array('message' => $err)
         );
     }
 }

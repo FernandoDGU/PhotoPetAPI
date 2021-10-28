@@ -107,6 +107,10 @@ class User{
         ';
         $stmt = $this->conn->prepare($query);
 
+        if(empty($this->email)){
+            $this->email = null;
+        }
+
         $this->email = htmlspecialchars(strip_tags($this->email));
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->password = htmlspecialchars(strip_tags($this->password));
@@ -124,13 +128,14 @@ class User{
         $stmt->bindParam(':description', $this->description);
         $stmt->bindParam(':image', $this->image);
 
+
+    
+
         if($stmt->execute()){
-            return true;
+            return "ok";
         }
 
-        printf("Error: %s.\n", $stmt->error);
-
-        return false;
+        return $stmt->errorCode();
     }
 
     public function updateUser(){
