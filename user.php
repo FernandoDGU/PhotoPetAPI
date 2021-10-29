@@ -6,7 +6,7 @@ header('Content-Type: application/json');
 include_once 'database.php';
 include_once 'models/userModel.php';
 
- switch($_SERVER['REQUEST_METHOD']){
+switch ($_SERVER['REQUEST_METHOD']) {
 
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
@@ -14,82 +14,98 @@ include_once 'models/userModel.php';
         break;
 
     case 'GET':
-        if(isset($_GET['email']) && isset($_GET['pass']))
+        if (isset($_GET['email']) && isset($_GET['pass']))
             logInUser($_GET['email'], $_GET['pass']);
-        else if(isset($_GET['email']))
+        else if (isset($_GET['email']))
             getUserByEmail($_GET['email']);
         else
             getUsers();
         break;
-    
+
     case 'PUT':
-        if(isset($_GET['email']))
-        {
+        if (isset($_GET['email'])) {
             $data = json_decode(file_get_contents("php://input"));
             updateUser($data, $_GET['email']);
         }
         break;
 
     case 'DELETE':
-        if(isset($_GET['email']))
-        {
+        if (isset($_GET['email'])) {
             deleteUser($_GET['email']);
         }
         break;
+}
 
-        
-
- }
-
-function getUsers(){
+function getUsers()
+{
     $database = new Database();
     $db = $database->connect();
     $user = new User($db);
     $result = $user->read();
     $num = $result->rowCount();
-   
-    if($num > 0){
-       $users_arr = array();
-       //$users_arr['data'] = array();
-   
-       while($row = $result->fetch(PDO::FETCH_ASSOC)){
-           extract($row);
-   
-           $user_item = array(
-               'email'         => $email,
-               'name'          => $name,
-               'password'      => $password,
-               'phone'         => $phone,
-               'description'   => $description,
-               'image'         => "data:image/png;base64," . base64_encode($image)
-           );
-   
-           //array_push($users_arr['data'], $user_item);
-           array_push($users_arr, $user_item);
-       }
-   
-       echo json_encode($users_arr);
-   
+
+    if ($num > 0) {
+        $users_arr = array();
+        //$users_arr['data'] = array();
+
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            extract($row);
+
+            $user_item = array(
+                'email'         => $email,
+                'fullname'          => $fullname,
+                'firstname'          => $firstname,
+                'lastname'          => $lastname,
+                'password'      => $password,
+                'phone'         => $phone,
+                'description'   => $description,
+                'image'         => "data:image/png;base64," . base64_encode($image)
+            );
+
+            //array_push($users_arr['data'], $user_item);
+            array_push($users_arr, $user_item);
+        }
+
+        echo json_encode($users_arr);
     } else {
-       echo json_encode(
-           array('message' => 'No Users Found')
-       );
+        $user_arr = array(
+            'email'         => null,
+            'fullname'          => null,
+            'firstname'          => null,
+            'lastname'          => null,
+            'password'      => null,
+            'phone'         => null,
+            'description'   => null,
+            'image'         => null
+        );
+        echo json_encode($user_arr);
     }
 }
 
-function getUserByEmail($id){
+function getUserByEmail($id)
+{
     $database = new Database();
     $db = $database->connect();
     $user = new User($db);
     $result = $user->singleRead($id);
-    if(empty($user->email)){
-        echo json_encode(
-            array('message' => 'No User Found')
+    if (empty($user->email)) {
+        $user_arr = array(
+            'email'         => null,
+            'fullname'      => null,
+            'firstname'     => null,
+            'lastname'      => null,
+            'password'      => null,
+            'phone'         => null,
+            'description'   => null,
+            'image'         => null
         );
-    }else{
+        echo json_encode($user_arr);
+    } else {
         $user_arr = array(
             'email'         => $user->email,
-            'name'          => $user->name,
+            'fullname'      => $user->fullname,
+            'firstname'     => $user->firstname,
+            'lastname'      => $user->lastname,
             'password'      => $user->password,
             'phone'         => $user->phone,
             'description'   => $user->description,
@@ -97,23 +113,32 @@ function getUserByEmail($id){
         );
         echo json_encode($user_arr);
     }
-    
-    
 }
 
-function logInUser($email, $pass){
+function logInUser($email, $pass)
+{
     $database = new Database();
     $db = $database->connect();
     $user = new User($db);
     $result = $user->userLogged($email, $pass);
-    if(empty($user->email)){
-        echo json_encode(
-            array('message' => 'No User Found')
+    if (empty($user->email)) {
+        $user_arr = array(
+            'email'         => null,
+            'fullname'      => null,
+            'firstname'     => null,
+            'lastname'      => null,
+            'password'      => null,
+            'phone'         => null,
+            'description'   => null,
+            'image'         => null
         );
-    }else{
+        echo json_encode($user_arr);
+    } else {
         $user_arr = array(
             'email'         => $user->email,
-            'name'          => $user->name,
+            'fullname'      => $user->fullname,
+            'firstname'     => $user->firstname,
+            'lastname'      => $user->lastname,
             'password'      => $user->password,
             'phone'         => $user->phone,
             'description'   => $user->description,
@@ -123,12 +148,15 @@ function logInUser($email, $pass){
     }
 }
 
-function insertUser($data){
+function insertUser($data)
+{
     $database = new Database();
     $db = $database->connect();
     $user = new User($db);
     $user->email = $data->email;
-    $user->name = $data->name;
+    $user->fullname = $data->fullname;
+    $user->firstname = $data->firstname;
+    $user->lastname = $data->lastname;
     $user->password = $data->password;
     $user->phone = $data->phone;
     $user->description = $data->description;
@@ -136,51 +164,55 @@ function insertUser($data){
 
     $err = $user->insertUser();
     //echo $err;
-    
-    if($err == "ok"){
+
+    if ($err == "ok") {
         echo json_encode(
             array('message' => 'ok')
         );
-    }else{
+    } else {
         echo json_encode(
             array('message' => $err)
         );
     }
 }
 
-function updateUser($data, $filterEmail){
+function updateUser($data, $filterEmail)
+{
     $database = new Database();
     $db = $database->connect();
     $user = new User($db);
     $user->email = $filterEmail;
-    $user->name = $data->name;
+    $user->fullname = $data->fullname;
+    $user->firstname = $data->firstname;
+    $user->lastname = $data->lastname;
     $user->password = $data->password;
     $user->phone = $data->phone;
     $user->description = $data->description;
     $user->image = $data->image;
 
-    if($user->updateUser()){
+    if ($user->updateUser()) {
         echo json_encode(
-            array('message' => 'User Modificated')
+            array('message' => 'ok')
         );
-    }else{
+    } else {
         echo json_encode(
-            array('message' => 'User Not Modificated')
+            array('message' => '0')
         );
     }
 }
 
-function deleteUser($filterEmail){
+function deleteUser($filterEmail)
+{
     $database = new Database();
     $db = $database->connect();
     $user = new User($db);
     $user->email = $filterEmail;
 
-    if($user->deleteUser()){
+    if ($user->deleteUser()) {
         echo json_encode(
             array('message' => 'User Eliminated')
         );
-    }else{
+    } else {
         echo json_encode(
             array('message' => 'User Not Eliminated')
         );
