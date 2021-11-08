@@ -1,19 +1,22 @@
 <?php
-class Database{
+class Database
+{
     private $host = 'localhost';
     private $db_name = 'photopetdb';
     private $username = 'root';
     private $password = '';
-    
+
     private $conn;
-    
-    public function connect(){
+
+    public function connect()
+    {
         $this->con = null;
-        try{
+        try {
             $this->conn = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->db_name, $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
-        } catch(PDOException $e){
+        } catch (PDOException $e) {
             echo 'Connection Error: ' . $e->getMessage();
+            die();
         }
 
         return $this->conn;
