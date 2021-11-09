@@ -5,9 +5,9 @@ class Publication
     private $conn;
     private $table = 'publication';
 
-    private $id_publication;
-    private $description;
-    private $email;
+    public $id_publication;
+    public $description;
+    public $email;
 
     private $aux_image;
 
@@ -15,6 +15,7 @@ class Publication
     {
         $this->conn = $db;
     }
+
 
     public function read()
     {
@@ -71,7 +72,7 @@ class Publication
             $this->table . '
                 SET
                 description = :description,
-                email = :email
+                email = :email;
         ';
         $stmt = $this->conn->prepare($query);
 
@@ -83,14 +84,13 @@ class Publication
         $stmt->bindParam(':description', $this->description);
         $stmt->bindParam(':email', $this->email);
 
-
-
-
         if ($stmt->execute()) {
-            return "ok";
-        }
 
-        return $stmt->errorCode();
+            $this->id_publication = $this->conn->lastInsertId();
+            return "ok";
+        } else {
+            return $stmt->errorCode();
+        }
     }
 
     public function updatePost()

@@ -4,6 +4,8 @@ header('Content-Type: application/json');
 
 include_once 'database.php';
 include_once 'models/publicationModel.php';
+include_once 'models/albumModel.php';
+include_once 'models/tagModel.php';
 
 switch ($_SERVER['REQUEST_METHOD']) {
 
@@ -46,14 +48,47 @@ function insertPost($data)
 
     $err = $post->insertPost();
     //echo $err;
-
+    $db = null;
     if ($err == "ok") {
-        echo json_encode(
-            array('message' => 'ok')
-        );
+        foreach ($data->albums as $album) {
+            $db = $database->connect();
+            $albumObject = new Album($db);
+            $albumObject->id_publication = $post->id_publication;
+            $albumObject->image = $album->imageString;
+            $albumObject->description = $album->description;
+            $err = $albumObject->insertAlbum();
+            $db = null;
+            $albumObject = null;
+            if ($err != "ok") {
+                echo json_encode(
+                    array('message' => "Error insertando el album")
+                );
+                break;
+            }
+        }
+        foreach ($data->tags as $tag) {
+            $db = $database->connect();
+            $tagObject = new Tag($db);
+            $tagObject->id_publication = $post->id_publication;
+            $tagObject->id_tag = $tag->id_tag;
+            $err = $tagObject->insertTagPublication();
+            $db = null;
+            $albumObject = null;
+            if ($err != "ok") {
+                echo json_encode(
+                    array('message' => "Error insertando etiqueta-publicación")
+                );
+                break;
+            }
+        }
+        if ($err == "ok") {
+            echo json_encode(
+                array('message' => "ok")
+            );
+        }
     } else {
         echo json_encode(
-            array('message' => $err)
+            array('message' => "Error insertando la publicación")
         );
     }
 }
