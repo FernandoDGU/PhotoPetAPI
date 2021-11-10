@@ -61,9 +61,10 @@ function getTags()
     $num = $result->rowCount();
 
     if ($num > 0) {
-        $tags_arr = array();
+
         //$users_arr['data'] = array();
 
+        $tags_arr = array();
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             extract($row);
 
@@ -78,10 +79,13 @@ function getTags()
 
         echo json_encode($tags_arr);
     } else {
-        $tags_arr = array(
+        $tags_arr = array();
+        $tag_item = array(
             'id_tag' => null,
             'tagname' => null
         );
+        array_push($tags_arr, $tag_item);
+
         echo json_encode($tags_arr);
     }
 }

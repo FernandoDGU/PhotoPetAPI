@@ -147,7 +147,7 @@ function getPosts()
 {
     $database = new Database();
     $db = $database->connect();
-    $post = new User($db);
+    $post = new Publication($db);
     $result = $post->read();
     $num = $result->rowCount();
 
@@ -159,10 +159,10 @@ function getPosts()
             extract($row);
 
             $post_item = array(
-                'id_description' => $id_description,
-                'email'          => $email,
+                'id_publication' => $id_publication,
                 'description'    => $description,
-                'image'          => "data:image/png;base64," . base64_encode($aux_image)
+                'email'          => $email,
+                'imgArray'       => "data:image/png;base64," . base64_encode($imgArray)
             );
 
             //array_push($users_arr['data'], $user_item);
@@ -171,12 +171,15 @@ function getPosts()
 
         echo json_encode($posts_arr);
     } else {
-        $posts_arr = array(
-            'id_description'    => null,
+        $posts_arr = array();
+        $post_item = array(
+            'id_publication'    => null,
             'email'             => null,
             'description'       => null,
-            'image'             => null
+            'imgArray'             => null,
+
         );
+        array_push($posts_arr, $post_item);
         echo json_encode($posts_arr);
     }
 }
