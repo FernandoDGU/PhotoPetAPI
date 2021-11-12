@@ -45,4 +45,24 @@ class Album
 
         return $stmt->errorCode();
     }
+
+    public function getAlbumsPost($id_post)
+    {
+        $query = 'SELECT 
+                id_album,
+                id_publication,
+                image,
+                description
+                FROM
+                ' . $this->table . '
+                WHERE
+                id_publication = ' . $id_post . '
+        ';
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute();
+
+        return $stmt;
+    }
 }

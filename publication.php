@@ -15,8 +15,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'GET':
-        if (isset($_GET['email']))
-            getUserPosts($_GET['email']);
+        if (isset($_GET['id_tag']))
+            getTagPosts($_GET['id_tag']);
         else if (isset($_GET['id']))
             getPostById($_GET['id']);
         else
@@ -93,28 +93,48 @@ function insertPost($data)
     }
 }
 
-function getUserPosts($email)
+function getTagPosts($id)
 {
     $database = new Database();
     $db = $database->connect();
     $post = new Publication($db);
-    $result = $post->readUserPosts($email);
-    if (empty($post->email)) {
-        $post_arr = array(
-            'id_publication'    => null,
-            'description'       => null,
-            'email'             => null,
-            'image'             => null
-        );
-        echo json_encode($post_arr);
+    $result = $post->readTagPosts($id);
+    $num = $result->rowCount();
+
+    if ($num > 0) {
+        $posts_arr = array();
+        //$users_arr['data'] = array();
+
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            extract($row);
+
+            $post_item = array(
+                'id_publication' => $id_publication,
+                'description'    => $description,
+                'email'          => $email,
+                'imgArray'       => "data:image/png;base64," . base64_encode($imgArray),
+                'authorImage'       => "data:image/png;base64," . base64_encode($authorImage),
+                'author'       => $author,
+                'likes'       => $likes
+            );
+
+            //array_push($users_arr['data'], $user_item);
+            array_push($posts_arr, $post_item);
+        }
+
+        echo json_encode($posts_arr);
     } else {
-        $post_arr = array(
-            'id_publication'    => $post->id_publication,
-            'description'       => $post->description,
-            'email'             => $post->email,
-            'image'             => $post->aux_image
+        $posts_arr = array();
+        $post_item = array(
+            'id_publication'    => null,
+            'email'             => null,
+            'description'       => null,
+            'imgArray'             => null,
+            'likes'       => null
+
         );
-        echo json_encode($post_arr);
+        array_push($posts_arr, $post_item);
+        echo json_encode($posts_arr);
     }
 }
 
@@ -162,7 +182,10 @@ function getPosts()
                 'id_publication' => $id_publication,
                 'description'    => $description,
                 'email'          => $email,
-                'imgArray'       => "data:image/png;base64," . base64_encode($imgArray)
+                'imgArray'       => "data:image/png;base64," . base64_encode($imgArray),
+                'authorImage'       => "data:image/png;base64," . base64_encode($authorImage),
+                'author'       => $author,
+                'likes'       => $likes
             );
 
             //array_push($users_arr['data'], $user_item);
@@ -177,6 +200,7 @@ function getPosts()
             'email'             => null,
             'description'       => null,
             'imgArray'             => null,
+            'likes'       => null
 
         );
         array_push($posts_arr, $post_item);

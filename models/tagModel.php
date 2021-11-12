@@ -77,4 +77,15 @@ class Tag
 
         return $stmt;
     }
+
+    public function getTagsPost($id_post)
+    {
+        $query = 'CALL Tags_by_Post(' . $id_post . ');';
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute();
+
+        return $stmt;
+    }
 }

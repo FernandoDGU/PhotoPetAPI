@@ -13,7 +13,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'GET':
-        getTags();
+        if (isset($_GET['id_post']))
+            getTagsByPost($_GET['id_post']);
+        else
+            getTags();
         break;
 
     case 'PUT':
@@ -58,6 +61,44 @@ function getTags()
     $db = $database->connect();
     $tag = new Tag($db);
     $result = $tag->read();
+    $num = $result->rowCount();
+
+    if ($num > 0) {
+
+        //$users_arr['data'] = array();
+
+        $tags_arr = array();
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            extract($row);
+
+            $tag_item = array(
+                'id_tag' => $id_tag,
+                'tagname' => $tagname
+            );
+
+            //array_push($users_arr['data'], $user_item);
+            array_push($tags_arr, $tag_item);
+        }
+
+        echo json_encode($tags_arr);
+    } else {
+        $tags_arr = array();
+        $tag_item = array(
+            'id_tag' => null,
+            'tagname' => null
+        );
+        array_push($tags_arr, $tag_item);
+
+        echo json_encode($tags_arr);
+    }
+}
+
+function getTagsByPost($id)
+{
+    $database = new Database();
+    $db = $database->connect();
+    $tag = new Tag($db);
+    $result = $tag->getTagsPost($id);
     $num = $result->rowCount();
 
     if ($num > 0) {

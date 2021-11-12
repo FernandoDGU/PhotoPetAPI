@@ -9,7 +9,9 @@ class Publication
     public $description;
     public $email;
 
-    private $aux_image;
+    private $image;
+    private $authorImage;
+    private $author;
 
     public function __construct($db)
     {
@@ -43,27 +45,19 @@ class Publication
             $this->description      = $row['description'];
             $this->email            = $row['email'];
 
-            $this->aux_image = "data:image/png;base64," . base64_encode($row['image']);
+            $this->image = "data:image/png;base64," . base64_encode($row['imgArray']);
         }
     }
 
-    public function readUserPosts($email)
+    public function readTagPosts($id)
     {
-        $query = 'CALL Posts_images_user("' . $email . '")';
+        $query = 'CALL Post_by_tag(' . $id . ');';
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->execute();
-        $num = $stmt->rowCount();
 
-        if ($num > 0) {
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            $this->id_publication   = $row['id_publication'];
-            $this->description      = $row['description'];
-            $this->email            = $row['email'];
-
-            $this->aux_image = "data:image/png;base64," . base64_encode($row['image']);
-        }
+        return $stmt;
     }
 
     public function insertPost()
