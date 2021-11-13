@@ -30,6 +30,28 @@ class Publication
         return $stmt;
     }
 
+    public function getUserPosts($email)
+    {
+        $query = 'CALL Posts_images_user("' . $email . '");';
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute();
+
+        return $stmt;
+    }
+
+    public function getUserLikedPosts($email)
+    {
+        $query = 'CALL Post_images_user_likes("' . $email . '");';
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute();
+
+        return $stmt;
+    }
+
     public function singleRead($id)
     {
         $query = 'CALL Post_images_id(' . $id . ')';
@@ -93,7 +115,9 @@ class Publication
             $this->table . '
                 SET
                 description = :description
-                WHERE id_publication = :id_publication
+                WHERE id_publication = :id_publication;
+                DELETE FROM album WHERE id_publication = :id_publication;
+                DELETE FROM publication_tag WHERE id_publication = :id_publication;
         ';
         $stmt = $this->conn->prepare($query);
 
