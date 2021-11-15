@@ -33,8 +33,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'DELETE':
-        if (isset($_GET['email'])) {
-            //deleteUser($_GET['email']);
+        if (isset($_GET['id'])) {
+            deletePost($_GET['id']);
         }
         break;
 }
@@ -352,5 +352,25 @@ function getUserLikedPosts($email)
         );
         array_push($posts_arr, $post_item);
         echo json_encode($posts_arr);
+    }
+}
+
+function deletePost($id)
+{
+    $database = new Database();
+    $db = $database->connect();
+    $post = new Publication($db);
+    $post->id_publication = $id;
+
+    $err = $post->deletePost();
+
+    if ($err = "ok") {
+        echo json_encode(
+            array('message' => "ok")
+        );
+    } else {
+        echo json_encode(
+            array('message' => $err)
+        );
     }
 }

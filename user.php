@@ -208,13 +208,15 @@ function deleteUser($filterEmail)
     $user = new User($db);
     $user->email = $filterEmail;
 
-    if ($user->deleteUser()) {
+    $err = $user->deleteUser();
+
+    if ($err = "ok") {
         echo json_encode(
-            array('message' => 'User Eliminated')
+            array('message' => "ok")
         );
     } else {
         echo json_encode(
-            array('message' => 'User Not Eliminated')
+            array('message' => $err)
         );
     }
 }
