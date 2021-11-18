@@ -4,7 +4,7 @@ class Database
     private $host = 'localhost';
     private $db_name = 'photopetdb';
     private $username = 'root';
-    private $password = '';
+    private $password = 'photopetapi';
 
     private $conn;
 
